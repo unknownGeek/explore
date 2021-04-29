@@ -1,0 +1,294 @@
+import 'dart:async';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:explore/models/user.dart';
+import 'package:explore/pages/CommentsPage.dart';
+import 'package:explore/pages/HomePage.dart';
+import 'package:explore/widgets/ProgressWidget.dart';
+import 'package:flutter/material.dart';
+
+class Post extends StatefulWidget {
+  final String postId;
+  final String ownerId;
+  final dynamic likes;
+  final String username;
+  final String description;
+  final String location;
+  final String url;
+
+  Post({
+    this.postId,
+    this.ownerId,
+    this.likes,
+    this.username,
+    this.description,
+    this.location,
+    this.url,
+  });
+
+  factory Post.fromDocument(DocumentSnapshot documentSnapshot) {
+    return Post(
+      postId: documentSnapshot["postId"],
+      ownerId: documentSnapshot["ownerId"],
+      likes: documentSnapshot["likes"],
+      username: documentSnapshot["username"],
+      description: documentSnapshot["description"],
+      location: documentSnapshot["location"],
+      url: documentSnapshot["url"],
+    );
+  }
+
+  int getTotalNumberOfLikes(likes) {
+    if (likes == null) {
+      return 0;
+    }
+    int counter = 0;
+    likes.values.forEach((eachValue) {
+      if (eachValue == true) {
+        ++counter;
+      }
+    });
+    return counter;
+  }
+
+  @override
+  _PostState createState() => _PostState(
+    postId: this.postId,
+    ownerId: this.ownerId,
+    likes: this.likes,
+    username: this.username,
+    description: this.description,
+    location: this.location,
+    url: this.url,
+    likeCount: getTotalNumberOfLikes(this.likes),
+  );
+}
+
+class _PostState extends State<Post> {
+  final String postId;
+  final String ownerId;
+  Map likes;
+  final String username;
+  final String description;
+  final String location;
+  final String url;
+  int likeCount;
+  bool isLiked;
+  bool showHeart = false;
+  final String currentOnlineUserId = currentUser?.id;
+
+  _PostState({
+    this.postId,
+    this.ownerId,
+    this.likes,
+    this.username,
+    this.description,
+    this.location,
+    this.url,
+    this.likeCount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    isLiked = hasCurrentUserLikedThePost();
+    return Padding(
+      padding: EdgeInsets.only(bottom: 12.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          createPostHead(),
+          createPostPicture(),
+          createPostFooter(),
+        ],
+      ),
+    );
+  }
+
+
+
+  createPostHead() {
+    return FutureBuilder(
+        future: userReference.document(ownerId).get(),
+        builder: (context, dataSnapshot) {
+          if (!dataSnapshot.hasData) {
+            return circularProgress();
+          }
+          User user = User.fromDocument(dataSnapshot.data);
+          bool isPostOwner = currentOnlineUserId == ownerId;
+
+          return ListTile(
+            leading: CircleAvatar(backgroundImage: CachedNetworkImageProvider(user.url), backgroundColor: Colors.grey,),
+            title: GestureDetector(
+              onTap: () => print("Show Profile"),
+              child: Text(
+                user.username,
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            ),
+            subtitle: Text(location, style: TextStyle(color: Colors.white),),
+            trailing: isPostOwner ? IconButton(
+                icon: Icon(Icons.more_vert),
+                color: Colors.white,
+                onPressed: () => print("Deleted"),
+            ) : Text(""),
+          );
+        }
+    );
+  }
+
+  hasCurrentUserLikedThePost() {
+    return likes[currentOnlineUserId] == true;
+  }
+
+  handleLikePost() {
+    // Fetching current user's like on the post
+    // whether it's already liked or not
+    bool _isLiked = hasCurrentUserLikedThePost();
+
+    // Toggle current user's like on the post in the collection DB
+    postsReference
+        .document(ownerId)
+        .collection("usersPosts")
+        .document(postId)
+        .updateData({'likes.$currentOnlineUserId': !_isLiked});
+
+    setState(() {
+      // Toggle current user's like on the post
+      likes[currentOnlineUserId] = isLiked = !_isLiked;
+
+      // Update the likes count after toggling
+      _isLiked ? --likeCount : ++likeCount;
+
+      // If the post wasn't liked already and got liked now after toggling,
+      // need to show a Heart on the post
+      if (!_isLiked) {
+        showHeart = true;
+      }
+    });
+
+    // Set timer for showing the Heart on the post
+    // And as part of its anonymous callback method, toggle
+    // showHeart to get it disappeared
+    Timer(Duration(milliseconds: 400), (){
+      setState(() {
+        showHeart = false;
+      });
+    });
+  }
+
+  createPostPicture() {
+    return GestureDetector(
+      onDoubleTap: handleLikePost,
+      child: Stack(
+        alignment: Alignment.center,
+        children: <Widget>[
+          Image.network(url),
+          animateHeart(),
+        ],
+      ),
+    );
+  }
+
+
+  animateHeart() {
+    return showHeart ? Icon(
+      Icons.favorite,
+      size: 100.0,
+      color: Colors.redAccent,
+    ) : Text("");
+
+    // return showHeart ? getAnimatedHeart() : Text("");
+  }
+
+  // getAnimatedHeart() {
+  //
+  //   return Animator(
+  //     // duration: Duration(milliseconds: 300),
+  //     tween: Tween(begin: 0.8, end: 1.4),
+  //     // curve: Curves.elasticOut,
+  //     cycles: 0,
+  //     builder: (context, animatorState, child) => Center(
+  //       child: Container(
+  //         margin: EdgeInsets.symmetric(vertical: 10),
+  //         height: animatorState.value,
+  //         width: animatorState.value,
+  //         child: Icon(
+  //           Icons.favorite,
+  //           size: 80.0,
+  //           color: Colors.pink,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+
+
+  showComments(BuildContext context, {String postId, String ownerId, String url}) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return CommentsPage(
+          postId: postId,
+          postOwnerId: ownerId,
+          postUrl: url
+      );
+    }));
+  }
+
+  createPostFooter() {
+    return Column(
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Padding(padding: EdgeInsets.only(top: 40.0, left: 20.0)),
+            GestureDetector(
+              onTap: handleLikePost,
+              child: Icon(
+                isLiked ? Icons.favorite : Icons.favorite_border,
+                color: isLiked ? Colors.redAccent : Colors.white,
+                size: 28.0,
+              ),
+            ),
+            Padding(padding: EdgeInsets.only(right: 20.0)),
+            GestureDetector(
+              onTap: () => showComments(
+                context,
+                postId: postId,
+                ownerId: ownerId,
+                url: url,
+              ),
+              child: Icon(
+                Icons.chat_bubble_outline,
+                size: 28.0,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+        Row(
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(left: 20.0),
+              child: Text(
+                "$likeCount likes",
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(left: 20.0),
+              child: Text("$username ", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+            ),
+            Expanded(
+              child: Text(description, style: TextStyle(color: Colors.white),),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
