@@ -1,5 +1,6 @@
 import 'package:explore/models/user.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:explore/pages/ActivityPage.dart';
 import 'package:explore/widgets/ProgressWidget.dart';
 import 'package:explore/pages/HomePage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -43,7 +44,7 @@ class _SearchPageState extends State<SearchPage> with AutomaticKeepAliveClientMi
         style: TextStyle(fontSize: 18.0, color: Colors.white),
         controller: searchTextEditingController,
         decoration: InputDecoration(
-          hintText: "Search here ...",
+          hintText: "Search",
           hintStyle: TextStyle(color: Colors.grey),
           enabledBorder: UnderlineInputBorder(
             borderSide: BorderSide(color: Colors.grey),
@@ -118,18 +119,21 @@ class UserResult extends StatelessWidget {
     return Padding(
         padding: EdgeInsets.all(3.0),
       child: Container(
-        color: Colors.white54,
+        color: Colors.black,
         child: Column(
           children: <Widget>[
             GestureDetector(
-              onTap: () => print("tapped"),
+              onTap: () => showProfile(context, profileId: eachUser.id),
               child: ListTile(
-                leading: CircleAvatar(backgroundColor: Colors.black, backgroundImage: CachedNetworkImageProvider(eachUser.url),),
-                title: Text(eachUser.profileName, style: TextStyle(
-                  color: Colors.black, fontSize: 16.0, fontWeight: FontWeight.bold,
+                leading: GestureDetector(
+                  onTap: () => showProfile(context, profileId: eachUser.id),
+                  child: CircleAvatar(backgroundColor: Colors.black, backgroundImage: CachedNetworkImageProvider(eachUser.url),),
+                ),
+                subtitle: Text(eachUser.profileName, style: TextStyle(
+                  color: Colors.grey, fontSize: 13.0, fontWeight: FontWeight.bold,
                 ),),
-                subtitle: Text(eachUser.username, style: TextStyle(
-                  color: Colors.black, fontSize: 13.0,
+                title: Text(eachUser.username, style: TextStyle(
+                  color: Colors.white, fontSize: 16.0, fontWeight: FontWeight.bold,
                 ),),
               ),
             )

@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore/models/user.dart';
+import 'package:explore/pages/ActivityPage.dart';
 import 'package:explore/pages/CommentsPage.dart';
 import 'package:explore/pages/HomePage.dart';
+import 'package:explore/utils/AppConstants.dart';
 import 'package:explore/widgets/ProgressWidget.dart';
 import 'package:flutter/material.dart';
 
@@ -118,9 +120,12 @@ class _PostState extends State<Post> {
           bool isPostOwner = currentOnlineUserId == ownerId;
 
           return ListTile(
-            leading: CircleAvatar(backgroundImage: CachedNetworkImageProvider(user.url), backgroundColor: Colors.grey,),
+            leading: GestureDetector(
+              onTap: () => showProfile(context, profileId: currentOnlineUserId),
+              child: CircleAvatar(backgroundImage: CachedNetworkImageProvider(user.url), backgroundColor: Colors.grey,),
+            ),
             title: GestureDetector(
-              onTap: () => print("Show Profile"),
+              onTap: () => showProfile(context, profileId: currentOnlineUserId),
               child: Text(
                 user.username,
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -227,7 +232,21 @@ class _PostState extends State<Post> {
       child: Stack(
         alignment: Alignment.center,
         children: <Widget>[
-          Image.network(url),
+          loadFireStoreImages ? Image.network(url)
+          : Container(
+              height: 200.0,
+              width: 350.0,
+              color: Colors.black,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.only(top: 20.0),
+                    child: Text("Couldn't load image.", style: TextStyle(color: Colors.white, fontSize: 15.0, fontWeight: FontWeight.normal),),
+                  ),
+                ],
+              ),
+          ),
           animateHeart(),
         ],
       ),

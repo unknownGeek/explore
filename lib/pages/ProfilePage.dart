@@ -23,16 +23,59 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   bool loading = false;
+  bool isFollowing;
   final String currentOnlineUserId = currentUser.id;
   int id = 0;
   int countPost = 0;
+  int followerCount = 0;
+  int followingCount = 0;
   List<Post> postsList = [];
   String postOrientation = "grid";
+  User profileUser;
 
+  @override
   void initState() {
+    super.initState();
     getAllProfilePosts();
+    getFollowers();
+    getFollowing();
+    checkIfFollowing();
   }
 
+  checkIfFollowing() async {
+    DocumentSnapshot doc =
+    await followersReference
+        .document(widget.userProfileId)
+        .collection("userFollowers")
+        .document(currentOnlineUserId)
+        .get();
+
+    setState(() {
+      isFollowing = doc.exists;
+    });
+  }
+
+  getFollowing() async {
+    QuerySnapshot querySnapshot = await followingReference
+        .document(widget.userProfileId)
+        .collection('userFollowing')
+        .getDocuments();
+
+    setState(() {
+      followingCount = querySnapshot.documents.length;
+    });
+  }
+
+  getFollowers() async {
+    QuerySnapshot querySnapshot = await followersReference
+        .document(widget.userProfileId)
+        .collection('userFollowers')
+        .getDocuments();
+
+    setState(() {
+      followerCount = querySnapshot.documents.length;
+    });
+  }
 
   createProfileTopView() {
     return FutureBuilder(
@@ -62,14 +105,14 @@ class _ProfilePageState extends State<ProfilePage> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: <Widget>[
                             createColumns("Posts", countPost.toString()),
-                            createColumns("Followers", "19M"),
-                            createColumns("Following", "4"),
+                            createColumns("Followers", followerCount.toString()),
+                            createColumns("Following", followingCount.toString()),
                           ],
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: <Widget>[
-                            createButton(),
+                            buildProfileButton(),
                           ],
                         ),
                       ],
@@ -77,14 +120,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ],
               ),
-              // Container(
-              //   alignment: Alignment.centerLeft,
-              //   padding: EdgeInsets.only(top: 13.0),
-              //   child: Text(
-              //     user.username,
-              //     style: TextStyle(fontSize: 14.0, color: Colors.white),
-              //   ),
-              // ),
               Container(
                 alignment: Alignment.centerLeft,
                 padding: EdgeInsets.only(top: 5.0),
@@ -128,16 +163,93 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  createButton() {
+  buildProfileButton() {
     bool ownProfile = currentOnlineUserId == widget.userProfileId;
     if (ownProfile) {
       return createButtonTitleAndFunction(title: "Edit Profile", performFunction: editUserProfile,);
-    } else {
-
+    } else if (isFollowing) {
+      return createButtonTitleAndFunction(title: "Unfollow", performFunction: handleUnfollowUser,);
+    } else if (!isFollowing) {
+      return createButtonTitleAndFunction(title: "Follow", performFunction: handleFollowUser,);
     }
   }
 
+  handleUnfollowUser() {
+    setState(() {
+      isFollowing = false;
+    });
+    // remove follower
+    followersReference
+        .document(widget.userProfileId)
+        .collection('userFollowers')
+        .document(currentOnlineUserId)
+        .get().then((doc) {
+          if (doc.exists) {
+            doc.reference.delete();
+          }
+    });
+
+    // remove following
+    followingReference
+        .document(currentOnlineUserId)
+        .collection('userFollowing')
+        .document(widget.userProfileId)
+        .get().then((doc) {
+          if (doc.exists) {
+            doc.reference.delete();
+          }
+        });
+
+    // delete activity feed item for them
+    activityFeedReference
+        .document(widget.userProfileId)
+        .collection('feedItems')
+        .document(currentOnlineUserId)
+        .get().then((doc) {
+          if (doc.exists) {
+            doc.reference.delete();
+          }
+      });
+  }
+
+  handleFollowUser() {
+    setState(() {
+      isFollowing = true;
+    });
+    // Make auth user follower of THAT user (update THEIR followers
+    // collection)
+    followersReference
+    .document(widget.userProfileId)
+    .collection('userFollowers')
+    .document(currentOnlineUserId)
+    .setData({});
+
+    // Put THAT user on YOUR following collection (update your
+    // following collection)
+    followingReference
+        .document(currentOnlineUserId)
+        .collection('userFollowing')
+        .document(widget.userProfileId)
+        .setData({});
+
+    // add activity feed item for THAT user to notify about new follower (us)
+    activityFeedReference
+    .document(widget.userProfileId)
+    .collection('feedItems')
+    .document(currentOnlineUserId)
+    .setData({
+      "type": "follow",
+      "ownerId": widget.userProfileId,
+      "username": currentUser?.username,
+      "userId": currentOnlineUserId,
+      "timestamp": DateTime.now(),
+      "userProfileImg": currentUser?.url,
+      "timestamp": DateTime.now(),
+    });
+  }
+
   createButtonTitleAndFunction({String title, Function performFunction}) {
+    bool ownProfile = currentOnlineUserId == widget.userProfileId;
     return Container(
       padding: EdgeInsets.only(top: 3.0),
       child: FlatButton(
@@ -148,8 +260,8 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Text(title, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: Colors.black,
-            border: Border.all(color: Colors.grey),
+            color: ownProfile ? Colors.black : (isFollowing ? Colors.black : Colors.blueAccent),
+            border: Border.all(color: ownProfile ? Colors.grey : (isFollowing ? Colors.grey : Colors.blueAccent),),
             borderRadius: BorderRadius.circular(6.0),
           ),
         ),
@@ -178,7 +290,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: header(
           context,
-          strTitle: currentUser != null && currentUser.username != null ? currentUser.username : "Profile"),
+          strTitle: profileUser != null && profileUser.username != null ? profileUser.username : "Profile"),
       body: ListView(
         children: <Widget>[
           createProfileTopView(),
@@ -236,12 +348,15 @@ class _ProfilePageState extends State<ProfilePage> {
       loading = true;
     });
 
-    QuerySnapshot querySnapshot = await postsReference.document(widget.userProfileId).collection("usersPosts").orderBy("timestamp", descending: true).getDocuments();
+    QuerySnapshot userPostQuerySnapshot = await postsReference.document(widget.userProfileId).collection("usersPosts").orderBy("timestamp", descending: true).getDocuments();
+
+    DocumentSnapshot profileUserDocumentSnapshot = await userReference.document(widget.userProfileId).get();
+    profileUser = User.fromDocument(profileUserDocumentSnapshot);
 
     setState(() {
       loading = false;
-      countPost = querySnapshot.documents.length;
-      postsList = querySnapshot.documents.map((documentSnapshot) => Post.fromDocument(documentSnapshot)).toList();
+      countPost = userPostQuerySnapshot.documents.length;
+      postsList = userPostQuerySnapshot.documents.map((documentSnapshot) => Post.fromDocument(documentSnapshot)).toList();
     });
   }
 

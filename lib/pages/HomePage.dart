@@ -1,7 +1,7 @@
 import 'package:explore/models/user.dart';
 import 'package:explore/pages/CreateAccountPage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:explore/pages/NotificationsPage.dart';
+import 'package:explore/pages/ActivityPage.dart';
 import 'package:explore/pages/ProfilePage.dart';
 import 'package:explore/pages/SearchPage.dart';
 import 'package:explore/pages/UploadPage.dart';
@@ -17,6 +17,8 @@ final StorageReference storageReference = FirebaseStorage.instance.ref().child("
 final postsReference = Firestore.instance.collection("posts");
 final commentsReference = Firestore.instance.collection("comments");
 final activityFeedReference = Firestore.instance.collection("feed");
+final followersReference = Firestore.instance.collection("followers");
+final followingReference = Firestore.instance.collection("following");
 
 final DateTime timestamp = DateTime.now();
 
@@ -121,7 +123,7 @@ class _HomePageState extends State<HomePage> {
           SearchPage(),
           UploadPage(gCurrentUser: currentUser,),
           // RaisedButton.icon(onPressed: logoutUser, icon: Icon(Icons.close), label: Text("Sign Out")),
-          NotificationsPage(),
+          ActivityPage(),
           ProfilePage(userProfileId: currentUser.id),
         ],
         controller: pageController,

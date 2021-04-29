@@ -69,6 +69,24 @@ class CommentsPageState extends State<CommentsPage> {
       "userId": currentUser.id,
     });
 
+    bool isNotPostOwner = postOwnerId != currentUser?.id;
+
+    if (isNotPostOwner) {
+      activityFeedReference
+          .document(postOwnerId)
+          .collection('feedItems')
+          .add({
+        "type": "comment",
+        "commentData": commentController.text,
+        "timestamp": DateTime.now(),
+        "postId": postId,
+        "userId": currentUser?.id,
+        "username": currentUser?.username,
+        "userProfileImg": currentUser?.url,
+        "url": postUrl,
+      });
+    }
+
     commentController.clear();
   }
 
@@ -145,7 +163,7 @@ class Comment extends StatelessWidget {
             comment,
             style: TextStyle(
               color: Colors.white,
-            )
+            ),
           ),
           subtitle: Text(
             timeago.format(timestamp.toDate()),
