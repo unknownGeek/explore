@@ -153,6 +153,12 @@ class _PostState extends State<Post> {
         .document(postId)
         .updateData({'likes.$currentOnlineUserId': !_isLiked});
 
+    if (_isLiked) {
+      removeLikeFromActivityFeed();
+    } else {
+      addLikeToActivityFeed();
+    }
+
     setState(() {
       // Toggle current user's like on the post
       likes[currentOnlineUserId] = isLiked = !_isLiked;
@@ -175,6 +181,44 @@ class _PostState extends State<Post> {
         showHeart = false;
       });
     });
+  }
+
+
+  addLikeToActivityFeed() {
+    // add a notification to the postOwner's activity feed only if
+    // comment made by OTHER user (to avoid getting notification for
+    // our own like)
+    bool isNotPostOwner = currentOnlineUserId != ownerId;
+    if (isNotPostOwner){
+      activityFeedReference
+          .document(ownerId)
+          .collection('feedItems')
+          .document(postId)
+          .setData({
+        "type": "like",
+        "username": currentUser?.username,
+        "userId": currentUser?.id,
+        "userProfileImg": currentUser?.url,
+        "postId": postId,
+        "url": url,
+        "timestamp": DateTime.now(),
+      });
+    }
+  }
+
+  removeLikeFromActivityFeed() {
+    bool isNotPostOwner = currentOnlineUserId != ownerId;
+    if (isNotPostOwner) {
+      activityFeedReference
+          .document(ownerId)
+          .collection('feedItems')
+          .document(postId)
+          .get().then((doc) {
+        if (doc.exists) {
+          doc.reference.delete();
+        }
+      });
+    }
   }
 
   createPostPicture() {
