@@ -94,8 +94,9 @@ class ActivityItem extends StatelessWidget {
         MaterialPageRoute(
             builder: (context) => PostScreenPage(
               postId: postId,
-              userId: userId,
-            )));
+              userId: currentUser?.id,
+            )
+        ));
   }
 
   configureMediaPreview(context) {
