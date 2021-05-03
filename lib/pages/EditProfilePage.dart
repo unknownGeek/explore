@@ -1,8 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:explore/main.dart';
 import 'package:explore/models/user.dart';
 import 'package:explore/pages/HomePage.dart';
-import 'package:explore/pages/ProfilePage.dart';
 import 'package:explore/widgets/ProgressWidget.dart';
 import "package:flutter/material.dart";
 
@@ -49,8 +49,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
   updateUserData() {
 
     setState(() {
-      _profileNameValid = profileNameTextEditingController.text.isNotEmpty && profileNameTextEditingController.text.trim().length > 4;
-      _bioValid = bioTextEditingController.text.isNotEmpty && bioTextEditingController.text.trim().length <= 500;
+      _profileNameValid = profileNameTextEditingController.text.isNotEmpty &&
+          profileNameTextEditingController.text.trim().length > 4;
+      _bioValid = bioTextEditingController.text.isNotEmpty &&
+          bioTextEditingController.text.trim().length <= 500;
     });
 
     if (_bioValid && _profileNameValid) {
@@ -74,64 +76,83 @@ class _EditProfilePageState extends State<EditProfilePage> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         iconTheme: IconThemeData(color: Colors.white),
-        title: Text("Edit Profile", style: TextStyle(color: Colors.white),),
+        title: Text(
+          "Edit Profile",
+          style: TextStyle(color: Colors.white),
+        ),
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.done, color: Colors.white, size: 30.0,), onPressed: updateUserData,),
+          IconButton(
+            icon: Icon(
+              Icons.done,
+              color: Colors.white,
+              size: 30.0,
+            ),
+            onPressed: updateUserData,
+          ),
         ],
       ),
-      body: loading ? circularProgress() : ListView(
-        children: <Widget>[
-          Container(
-            child: Column(
+      body: loading
+          ? circularProgress()
+          : ListView(
               children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(top: 15.0, bottom: 7.0),
-                  child: CircleAvatar(
-                    radius: 52.0,
-                    backgroundImage: CachedNetworkImageProvider(user.url),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(16.0),
+                Container(
                   child: Column(
                     children: <Widget>[
-                      createProfileNameTextFormField(),
-                      createBioTextFormField()
+                      Padding(
+                        padding: EdgeInsets.only(top: 15.0, bottom: 7.0),
+                        child: CircleAvatar(
+                          radius: 52.0,
+                          backgroundImage: CachedNetworkImageProvider(user.url),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Column(
+                          children: <Widget>[
+                            createProfileNameTextFormField(),
+                            createBioTextFormField()
+                          ],
+                        ),
+                      ),
+                      // Padding(
+                      //   padding: EdgeInsets.only(top: 29.0, left: 50.0, right: 50.0),
+                      //   child: RaisedButton(
+                      //     onPressed: updateUserData,
+                      //     child: Text(
+                      //       "Update",
+                      //       style: TextStyle(color: Colors.black, fontSize: 16.0),
+                      //     ),
+                      //   ),
+                      // ),
+                      Padding(
+                        padding:
+                            EdgeInsets.only(top: 10.0, left: 50.0, right: 50.0),
+                        child: RaisedButton(
+                          color: Colors.red,
+                          onPressed: logoutUser,
+                          child: Text(
+                            "Logout",
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 14.0),
+                          ),
+                        ),
+                      ),
                     ],
-                  ),
-                ),
-                // Padding(
-                //   padding: EdgeInsets.only(top: 29.0, left: 50.0, right: 50.0),
-                //   child: RaisedButton(
-                //     onPressed: updateUserData,
-                //     child: Text(
-                //       "Update",
-                //       style: TextStyle(color: Colors.black, fontSize: 16.0),
-                //     ),
-                //   ),
-                // ),
-                Padding(
-                  padding: EdgeInsets.only(top: 10.0, left: 50.0, right: 50.0),
-                  child: RaisedButton(
-                    color: Colors.red,
-                    onPressed: logoutUser,
-                    child: Text(
-                      "Logout",
-                      style: TextStyle(color: Colors.white, fontSize: 14.0),
-                    ),
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
     );
   }
 
   logoutUser() async {
     await gSignIn.signOut();
-    Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
+    this.setState(() {
+      loading = false;
+    });
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => MyApp()),
+        (Route<dynamic> route) => false);
   }
 
   Column createProfileNameTextFormField() {
@@ -151,9 +172,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           decoration: InputDecoration(
             hintText: "Write profile name here...",
             enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.grey
-              ),
+              borderSide: BorderSide(color: Colors.grey),
             ),
             focusedBorder: UnderlineInputBorder(
               borderSide: BorderSide(color: Colors.white),
@@ -183,19 +202,20 @@ class _EditProfilePageState extends State<EditProfilePage> {
           decoration: InputDecoration(
             hintText: "Write Bio here...",
             enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(
-                  color: Colors.grey
-              ),
+              borderSide: BorderSide(color: Colors.grey),
             ),
             focusedBorder: UnderlineInputBorder(
               borderSide: BorderSide(color: Colors.white),
             ),
             hintStyle: TextStyle(color: Colors.grey),
-            errorText: _bioValid ? null : (bioTextEditingController.text.isEmpty ? "Bio too short." : "Bio too long."),
+            errorText: _bioValid
+                ? null
+                : (bioTextEditingController.text.isEmpty
+                    ? "Bio too short."
+                    : "Bio too long."),
           ),
         ),
       ],
     );
   }
-
 }

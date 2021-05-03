@@ -100,10 +100,6 @@ class _HomePageState extends State<HomePage> {
     gSignIn.signIn();
   }
 
-  logoutUser() {
-    gSignIn.signOut();
-  }
-
   whenPageChanges(int pageIndex) {
     setState(() {
       this.getPageIndex = pageIndex;
@@ -122,7 +118,6 @@ class _HomePageState extends State<HomePage> {
           TimeLinePage(),
           SearchPage(),
           UploadPage(gCurrentUser: currentUser,),
-          // RaisedButton.icon(onPressed: logoutUser, icon: Icon(Icons.close), label: Text("Sign Out")),
           ActivityPage(),
           ProfilePage(userProfileId: currentUser.id),
         ],
@@ -167,11 +162,12 @@ class _HomePageState extends State<HomePage> {
               "Explore",
               style: TextStyle(fontSize: 92.0, color: Colors.white, fontFamily: "Signatra"),
             ),
+            Divider(),
             GestureDetector(
               onTap: loginUser,
               child: Container(
-                width: 270.0,
-                height: 65.0,
+                width: 200.0,
+                height: 40.0,
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage("assets/images/google_signin_button.png"),
