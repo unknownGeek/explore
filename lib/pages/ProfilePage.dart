@@ -260,8 +260,8 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Text(title, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: ownProfile ? Colors.black : (isFollowing ? Colors.black : Colors.blueAccent),
-            border: Border.all(color: ownProfile ? Colors.grey : (isFollowing ? Colors.grey : Colors.blueAccent),),
+            color: ownProfile ? Colors.black : (isFollowing ? Colors.black : Colors.deepPurple),
+            border: Border.all(color: ownProfile ? Colors.grey : (isFollowing ? Colors.grey : Colors.deepPurple),),
             borderRadius: BorderRadius.circular(6.0),
           ),
         ),

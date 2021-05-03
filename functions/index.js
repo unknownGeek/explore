@@ -13,7 +13,7 @@ admin.initializeApp();
 // https://firebase.google.com/docs/functions/firestore-events
 
 
-//exports.onCreateFollower = functions.firestore
+// exports.onCreateFollower = functions.firestore
 //    .document("/followers/{userId}/userFollowers/{followerId}")
 //    .onCreate( (snapshot, context) => {
 //      console.log("Follower Created", snapshot.id);

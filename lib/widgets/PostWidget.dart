@@ -6,9 +6,9 @@ import 'package:explore/models/user.dart';
 import 'package:explore/pages/ActivityPage.dart';
 import 'package:explore/pages/CommentsPage.dart';
 import 'package:explore/pages/HomePage.dart';
-import 'package:explore/utils/AppConstants.dart';
 import 'package:explore/widgets/ProgressWidget.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class Post extends StatefulWidget {
   final String postId;
@@ -301,20 +301,22 @@ class _PostState extends State<Post> {
       child: Stack(
         alignment: Alignment.center,
         children: <Widget>[
-          loadFireStoreImages ? Image.network(url)
-          : Container(
-              height: 200.0,
-              width: 350.0,
-              color: Colors.black,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(top: 20.0),
-                    child: Text("Couldn't load image.", style: TextStyle(color: Colors.white, fontSize: 15.0, fontWeight: FontWeight.normal),),
+          Container(
+            height: 450.0,
+            width: 400.0,
+            child: CachedNetworkImage(
+              imageUrl: url,
+              imageBuilder: (context, imageProvider) => Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: imageProvider,
+                    fit: BoxFit.cover,
                   ),
-                ],
+                ),
               ),
+              placeholder: (context, url) => CircularProgressIndicator(),
+              errorWidget: (context, url, error) => Icon(Icons.error),
+            ),
           ),
           animateHeart(),
         ],
@@ -325,7 +327,7 @@ class _PostState extends State<Post> {
 
   animateHeart() {
     return showHeart ? Icon(
-      Icons.favorite,
+      FontAwesomeIcons.fire,
       size: 100.0,
       color: Colors.redAccent,
     ) : Text("");
@@ -376,7 +378,7 @@ class _PostState extends State<Post> {
             GestureDetector(
               onTap: handleLikePost,
               child: Icon(
-                isLiked ? Icons.favorite : Icons.favorite_border,
+                isLiked ? FontAwesomeIcons.fire : FontAwesomeIcons.fire,
                 color: isLiked ? Colors.redAccent : Colors.white,
                 size: 28.0,
               ),
@@ -390,7 +392,7 @@ class _PostState extends State<Post> {
                 url: url,
               ),
               child: Icon(
-                Icons.chat_bubble_outline,
+                FontAwesomeIcons.comments,
                 size: 28.0,
                 color: Colors.white,
               ),

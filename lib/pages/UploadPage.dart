@@ -121,7 +121,7 @@ class _UploadPageState extends State<UploadPage> with AutomaticKeepAliveClientMi
     final path = tDirectory.path;
     ImD.Image mImageFile = ImD.decodeImage(file.readAsBytesSync());
     final compressedImageFile = File('$path/img_$postId.jpg')
-      ..writeAsBytesSync(ImD.encodeJpg(mImageFile, quality: 30));
+      ..writeAsBytesSync(ImD.encodeJpg(mImageFile, quality: 10));
     setState(() {
       file = compressedImageFile;
     });

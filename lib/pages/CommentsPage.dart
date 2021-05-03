@@ -7,6 +7,8 @@ import 'package:explore/widgets/ProgressWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import 'ActivityPage.dart';
+
 class CommentsPage extends StatefulWidget {
   final String postId;
   final String postOwnerId;
@@ -156,8 +158,9 @@ class Comment extends StatelessWidget {
     return Column(
       children: <Widget>[
         ListTile(
-          leading: CircleAvatar(
-            backgroundImage: CachedNetworkImageProvider(avatarUrl),
+          leading: GestureDetector(
+            onTap: () => showProfile(context, profileId: userId),
+            child: CircleAvatar(backgroundColor: Colors.black, backgroundImage: CachedNetworkImageProvider(avatarUrl),),
           ),
           title: Text(
             comment,
@@ -171,7 +174,10 @@ class Comment extends StatelessWidget {
               color: Colors.grey,
             ),
           ),
-          trailing: Text("$username ", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+          trailing: GestureDetector(
+            onTap: () => showProfile(context, profileId: userId),
+            child: Text("$username ", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+          ),
         ),
       ],
     );
