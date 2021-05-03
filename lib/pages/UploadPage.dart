@@ -33,8 +33,8 @@ class _UploadPageState extends State<UploadPage> with AutomaticKeepAliveClientMi
     Navigator.pop(context);
     File imageFile = await ImagePicker.pickImage(
         source: ImageSource.camera,
-      maxHeight: 680,
-      maxWidth: 970,
+        maxHeight: 680,
+        maxWidth: 970,
     );
 
     setState(() {
@@ -56,7 +56,7 @@ class _UploadPageState extends State<UploadPage> with AutomaticKeepAliveClientMi
   takeImage(mContext) {
     return showDialog(
         context: mContext,
-      builder: (context) {
+        builder: (context) {
           return SimpleDialog(
             title: Text("New Post", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
             children: <Widget>[
@@ -90,7 +90,7 @@ class _UploadPageState extends State<UploadPage> with AutomaticKeepAliveClientMi
             child: RaisedButton(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular((9.0))),
               child: Text("Upload Image", style: TextStyle(color: Colors.white, fontSize: 20.0),),
-              color: Colors.green,
+              color: Colors.deepPurple,
               onPressed: () => takeImage(context),
             ),
           ),

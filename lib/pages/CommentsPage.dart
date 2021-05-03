@@ -60,6 +60,9 @@ class CommentsPageState extends State<CommentsPage> {
   }
 
   addComment() {
+    if (commentController.text == null || commentController.text.isEmpty) {
+      return;
+    }
     commentsReference
     .document(postId)
         .collection("comments")
@@ -103,6 +106,10 @@ class CommentsPageState extends State<CommentsPage> {
           ),
           Divider(),
           ListTile(
+            leading: GestureDetector(
+              onTap: () => showProfile(context, profileId: currentUser?.id),
+              child: CircleAvatar(backgroundImage: CachedNetworkImageProvider(currentUser?.url), backgroundColor: Colors.grey,),
+            ),
             title: TextFormField(
               style: TextStyle(color: Colors.white),
               controller: commentController,
@@ -112,14 +119,9 @@ class CommentsPageState extends State<CommentsPage> {
               ),
             ),
             trailing: OutlineButton(
-              onPressed: addComment,
+              onPressed:  addComment,
               borderSide: BorderSide.none,
-              child: Text(
-                "Post",
-                style: TextStyle(
-                  color: Colors.blueAccent,
-                  fontSize: 16.0,
-                ),),
+              child: Icon(Icons.send, color: Colors.deepPurple,),
             ),
           ),
         ],
@@ -162,10 +164,20 @@ class Comment extends StatelessWidget {
             onTap: () => showProfile(context, profileId: userId),
             child: CircleAvatar(backgroundColor: Colors.black, backgroundImage: CachedNetworkImageProvider(avatarUrl),),
           ),
-          title: Text(
-            comment,
-            style: TextStyle(
-              color: Colors.white,
+          title: RichText(
+            text: TextSpan(
+              children: [
+                WidgetSpan(
+                  child: GestureDetector(
+                    onTap: () => showProfile(context, profileId: userId),
+                    child: Text(username, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+                  ),
+                ),
+                TextSpan(
+                  text: ' ' + comment,
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal),
+                ),
+              ],
             ),
           ),
           subtitle: Text(
@@ -173,10 +185,6 @@ class Comment extends StatelessWidget {
             style: TextStyle(
               color: Colors.grey,
             ),
-          ),
-          trailing: GestureDetector(
-            onTap: () => showProfile(context, profileId: userId),
-            child: Text("$username ", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
           ),
         ),
       ],
