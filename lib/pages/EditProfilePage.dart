@@ -1,8 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:explore/apis/FirebaseApi.dart';
+import 'package:explore/enums/UserState.dart';
 import 'package:explore/main.dart';
 import 'package:explore/models/user.dart';
 import 'package:explore/pages/HomePage.dart';
+import 'package:explore/widgets/OnlineDotIndicator.dart';
 import 'package:explore/widgets/ProgressWidget.dart';
 import "package:flutter/material.dart";
 
@@ -100,9 +103,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     children: <Widget>[
                       Padding(
                         padding: EdgeInsets.only(top: 15.0, bottom: 7.0),
-                        child: CircleAvatar(
-                          radius: 52.0,
-                          backgroundImage: CachedNetworkImageProvider(user.url),
+                        child: Stack(
+                          children: [
+                            CircleAvatar(
+                              radius: 52.0,
+                              backgroundImage: CachedNetworkImageProvider(user.url),
+                            ),
+                            OnlineDotIndicator(userId: user.id,),
+                          ],
                         ),
                       ),
                       Padding(
@@ -114,16 +122,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           ],
                         ),
                       ),
-                      // Padding(
-                      //   padding: EdgeInsets.only(top: 29.0, left: 50.0, right: 50.0),
-                      //   child: RaisedButton(
-                      //     onPressed: updateUserData,
-                      //     child: Text(
-                      //       "Update",
-                      //       style: TextStyle(color: Colors.black, fontSize: 16.0),
-                      //     ),
-                      //   ),
-                      // ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 10.0, left: 50.0, right: 50.0),
+                        child: RaisedButton(
+                          color: Colors.deepPurple,
+                          onPressed: setCurrentUserOnlineOrOffline,
+                          child: Text(
+                            "Go Online/Offline",
+                            style: TextStyle(color: Colors.black, fontSize: 14.0),
+                          ),
+                        ),
+                      ),
                       Padding(
                         padding:
                             EdgeInsets.only(top: 10.0, left: 50.0, right: 50.0),
@@ -142,6 +151,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
               ],
             ),
+    );
+  }
+
+  setCurrentUserOnlineOrOffline() async {
+    UserState userState = await FirebaseApi.getUserState();
+    UserState newUserState = UserState.Online;
+    if (userState == UserState.Online) {
+      newUserState = UserState.Offline;
+    }
+    FirebaseApi.setUserState(
+      userId: widget.currentOnlineUserId,
+      userState: newUserState,
     );
   }
 

@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:explore/models/user.dart';
 import 'package:explore/pages/EditProfilePage.dart';
 import 'package:explore/pages/HomePage.dart';
+import 'package:explore/widgets/OnlineDotIndicator.dart';
 import 'package:explore/widgets/PostTileWidget.dart';
 import 'package:explore/widgets/PostWidget.dart';
 import 'package:explore/widgets/ProgressWidget.dart';
@@ -23,7 +24,9 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   bool loading = false;
-  bool isFollowing;
+  bool isFollowing = false;
+  bool isBeingFollowed = false;
+  bool isRequestPending = false;
   final String currentOnlineUserId = currentUser.id;
   int id = 0;
   int countPost = 0;
@@ -40,6 +43,8 @@ class _ProfilePageState extends State<ProfilePage> {
     getFollowers();
     getFollowing();
     checkIfFollowing();
+    checkIfBeingFollowed();
+    checkIfPendingRequest();
   }
 
   checkIfFollowing() async {
@@ -52,6 +57,32 @@ class _ProfilePageState extends State<ProfilePage> {
 
     setState(() {
       isFollowing = doc.exists;
+    });
+  }
+
+  checkIfBeingFollowed() async {
+    DocumentSnapshot doc =
+    await followersReference
+        .document(currentOnlineUserId)
+        .collection("userFollowers")
+        .document(widget.userProfileId)
+        .get();
+
+    setState(() {
+      isBeingFollowed = doc.exists;
+    });
+  }
+
+  checkIfPendingRequest() async {
+    DocumentSnapshot doc =
+    await requestsSentReference
+        .document(currentOnlineUserId)
+        .collection("sentFollowRequests")
+        .document(widget.userProfileId)
+        .get();
+
+    setState(() {
+      isRequestPending = doc.exists;
     });
   }
 
@@ -78,6 +109,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   createProfileTopView() {
+    bool ownProfile = currentOnlineUserId == widget.userProfileId;
     return FutureBuilder(
       future: userReference.document(widget.userProfileId).get(),
       builder: (context, dataSnapshot) {
@@ -91,10 +123,20 @@ class _ProfilePageState extends State<ProfilePage> {
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  CircleAvatar(
-                    radius: 45.0,
-                    backgroundColor: Colors.grey,
-                    backgroundImage: CachedNetworkImageProvider(user.url),
+                  // CircleAvatar(
+                  //   radius: 45.0,
+                  //   backgroundColor: Colors.grey,
+                  //   backgroundImage: CachedNetworkImageProvider(user.url),
+                  // ),
+                  Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 45.0,
+                        backgroundImage: CachedNetworkImageProvider(user.url),
+                      ),
+                      if(ownProfile || isFollowing)
+                        OnlineDotIndicator(userId: user.id,),
+                    ],
                   ),
                   Expanded(
                     flex: 1,
@@ -169,9 +211,37 @@ class _ProfilePageState extends State<ProfilePage> {
       return createButtonTitleAndFunction(title: "Edit Profile", performFunction: editUserProfile,);
     } else if (isFollowing) {
       return createButtonTitleAndFunction(title: "Unfollow", performFunction: handleUnfollowUser,);
+    } else if (isRequestPending) {
+      return createButtonTitleAndFunction(title: "Requested", performFunction: handleCancelRequest,);
     } else if (!isFollowing) {
-      return createButtonTitleAndFunction(title: "Follow", performFunction: handleFollowUser,);
+      return createButtonTitleAndFunction(title: isBeingFollowed ? "Follow Back" : "Follow", performFunction: handleSendFollowRequest,);
     }
+  }
+
+  handleSendFollowRequest() {
+    setState(() {
+      isRequestPending = true;
+    });
+
+    // Put other user in auth user's requestsSent collection
+    requestsSentReference
+        .document(currentOnlineUserId)
+        .collection('sentFollowRequests')
+        .document(widget.userProfileId)
+        .setData({});
+
+    // Put auth user in other user's requestsReceived collection
+    requestsReceivedReference
+        .document(widget.userProfileId)
+        .collection('receivedFollowRequests')
+        .document(currentOnlineUserId)
+        .setData({
+          'username' : currentUser?.username,
+          'profileName' : currentUser?.profileName,
+          'url' : currentUser?.url,
+          'createdDate' : DateTime.now(),
+          'userId' : currentOnlineUserId,
+        });
   }
 
   handleUnfollowUser() {
@@ -210,6 +280,34 @@ class _ProfilePageState extends State<ProfilePage> {
             doc.reference.delete();
           }
       });
+  }
+
+  handleCancelRequest() {
+    setState(() {
+      isFollowing = false;
+      isRequestPending = false;
+    });
+    // remove sent request
+    requestsSentReference
+        .document(currentOnlineUserId)
+        .collection('sentFollowRequests')
+        .document(widget.userProfileId)
+        .get().then((doc) {
+      if (doc.exists) {
+        doc.reference.delete();
+      }
+    });
+
+    // remove received request
+    requestsReceivedReference
+        .document(widget.userProfileId)
+        .collection('receivedFollowRequests')
+        .document(currentOnlineUserId)
+        .get().then((doc) {
+      if (doc.exists) {
+        doc.reference.delete();
+      }
+    });
   }
 
   handleFollowUser() {
@@ -260,8 +358,8 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Text(title, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: ownProfile ? Colors.black : (isFollowing ? Colors.black : Colors.deepPurple),
-            border: Border.all(color: ownProfile ? Colors.grey : (isFollowing ? Colors.grey : Colors.deepPurple),),
+            color: ownProfile || isRequestPending ? Colors.black : (isFollowing ? Colors.black : Colors.deepPurple),
+            border: Border.all(color: ownProfile || isRequestPending ? Colors.grey : (isFollowing ? Colors.grey : Colors.deepPurple),),
             borderRadius: BorderRadius.circular(6.0),
           ),
         ),
@@ -287,17 +385,24 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    bool ownProfile = currentUser?.id == widget.userProfileId;
     return Scaffold(
       appBar: header(
           context,
           strTitle: profileUser != null && profileUser.username != null ? profileUser.username : "Profile"),
-      body: ListView(
+      body: ownProfile == true || isFollowing == true ? ListView(
         children: <Widget>[
           createProfileTopView(),
           Divider(),
           createListAndGridPostOrientation(),
           Divider(height: 0.0,),
           displayProfilePost(),
+        ],
+      ) : ListView(
+        children: <Widget>[
+          createProfileTopView(),
+          Divider(),
+          Text("This account is private.", style: TextStyle(color: Colors.white, fontSize: 15.0, fontWeight: FontWeight.w500),),
         ],
       ),
     );

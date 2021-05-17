@@ -35,6 +35,7 @@ dependencies:
   firebase_storage: ^2.1.0+1
   flutter_svg:
   font_awesome_flutter: ^8.8.1
+  swipe_to: ^0.0.1+8
 
 dev_dependencies:
   flutter_test:

@@ -1,3 +1,5 @@
+
+import 'package:explore/models/token.dart';
 import 'package:explore/models/user.dart';
 import 'package:explore/pages/CreateAccountPage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,10 +8,15 @@ import 'package:explore/pages/ProfilePage.dart';
 import 'package:explore/pages/SearchPage.dart';
 import 'package:explore/pages/UploadPage.dart';
 import 'package:explore/pages/TimeLinePage.dart';
+import 'package:explore/services/PushNotificationService.dart';
+import 'package:explore/todo_button/add_todo_button.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
+import 'FollowRequestsPage.dart';
 
 final GoogleSignIn gSignIn = GoogleSignIn();
 final userReference = Firestore.instance.collection("users");
@@ -19,6 +26,9 @@ final commentsReference = Firestore.instance.collection("comments");
 final activityFeedReference = Firestore.instance.collection("feed");
 final followersReference = Firestore.instance.collection("followers");
 final followingReference = Firestore.instance.collection("following");
+final requestsReceivedReference = Firestore.instance.collection("requestsReceived");
+final requestsSentReference = Firestore.instance.collection("requestsSent");
+final FirebaseMessaging fcm = FirebaseMessaging();
 
 final DateTime timestamp = DateTime.now();
 
@@ -30,7 +40,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  
+
   bool isSignedIn = false;
 
   PageController pageController;
@@ -46,14 +56,17 @@ class _HomePageState extends State<HomePage> {
     gSignIn.onCurrentUserChanged.listen((gSignInAccount) {
       controlSignIn(gSignInAccount);
     }, onError: (gError) {
-      print("Error Message : " + gError);
+      print("Error Message : ");
+      print(gError);
     });
 
     gSignIn.signInSilently(suppressErrors: false).then((gSignInAccount) {
       controlSignIn(gSignInAccount);
     }).catchError((gError) {
-      print("Error Message : " + gError);
+      print("Error Message : ");
+      print(gError);
     });
+    // handlePushNotificationService();
   }
 
   controlSignIn(GoogleSignInAccount signInAccount) async {
@@ -67,6 +80,27 @@ class _HomePageState extends State<HomePage> {
         isSignedIn = false;
       });
     }
+  }
+
+  handlePushNotificationService() {
+    PushNotificationService _pushNotificationService = PushNotificationService();
+    _pushNotificationService.initialize();
+  }
+
+  generateFcmToken(currentUser) async {
+    final fcmToken = await fcm.getToken();
+    print('currentUserId = ${currentUser?.id}');
+    print('token generated = ${fcmToken.toString()}');
+    final tokenRef = userReference
+        .document(currentUser?.id)
+        .collection('tokens')
+        .document(fcmToken);
+    
+    await tokenRef
+        .setData(
+          Token(token: fcmToken, createdAt: DateTime.now())
+            .toJson()
+      );
   }
 
   void saveUserInfoToFireStore() async {
@@ -89,8 +123,10 @@ class _HomePageState extends State<HomePage> {
     }
 
     currentUser = User.fromDocument(documentSnapshot);
+    // await generateFcmToken(currentUser);
   }
 
+  @override
   void dispose() {
     pageController.dispose();
     super.dispose();
@@ -113,13 +149,24 @@ class _HomePageState extends State<HomePage> {
 
   Widget buildHomeScreen() {
     return Scaffold(
-      body: PageView(
+      // floatingActionButton: RaisedButton.icon(onPressed: logoutUser, icon: Icon(Icons.close), label: Text("Sign Out")),
+      body:
+      PageView(
         children: <Widget>[
           TimeLinePage(),
           SearchPage(),
           UploadPage(gCurrentUser: currentUser,),
           ActivityPage(),
           ProfilePage(userProfileId: currentUser.id),
+          Stack(
+            children: [
+              FollowRequestsPage(),
+              const Align(
+                alignment: Alignment.bottomRight,
+                child: AddTodoButton(),
+              ),
+            ],
+          ),
         ],
         controller: pageController,
         onPageChanged: whenPageChanges,
@@ -137,6 +184,7 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(icon: Icon(Icons.monochrome_photos, size:  37.0,)),
           BottomNavigationBarItem(icon: Icon(Icons.favorite_border)),
           BottomNavigationBarItem(icon: Icon(Icons.person)),
+          BottomNavigationBarItem(icon: Icon(Icons.person_add)),
         ],
       ),
     );
@@ -175,7 +223,7 @@ class _HomePageState extends State<HomePage> {
                   )
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
