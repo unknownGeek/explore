@@ -33,7 +33,7 @@ class _ActivityPageState extends State<ActivityPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: header(context, strTitle: "Activity"),
+      appBar: header(context, strTitle: "Activity", isActivityPage: true),
       body: Container(
         child: FutureBuilder(
           future: getActivityFeed(),

@@ -13,7 +13,14 @@ class ProfileHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        height: 60,
+        decoration: BoxDecoration(
+          color: Colors.deepPurple,
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(30),//25
+            bottomRight: Radius.circular(30),
+          ),
+        ),
+        height: 50,
         padding: EdgeInsets.all(1).copyWith(left: 0),
         child: Column(
           children: [

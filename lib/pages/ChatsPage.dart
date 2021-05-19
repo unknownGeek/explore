@@ -16,12 +16,11 @@ class ChatsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    backgroundColor: Colors.deepPurple,
-    // backgroundColor: Colors.transparent,
+    backgroundColor: Colors.transparent,
     body: SafeArea(
       child: TweenAnimationBuilder(
         tween: Tween(begin: 0.0, end: 1.0),
-        duration: Duration(milliseconds: 1000),
+        duration: Duration(milliseconds: 1500),
         child: StreamBuilder<List<User>>(
           stream: FirebaseApi.getUsers(),
           builder: (context, snapshot) {

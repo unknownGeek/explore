@@ -1,9 +1,12 @@
 import 'package:explore/pages/ChatsPage.dart';
+import 'package:explore/pages/FollowRequestsPage.dart';
+import 'package:explore/todo_button/add_todo_button.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import 'chat_body_widget.dart';
+import 'StaggeredGridWidget.dart';
 
-AppBar header(context, {bool isAppTitle = false, String strTitle, disappearedBackButton=false}) {
+AppBar header(context, {bool isAppTitle = false, String strTitle, disappearedBackButton=false, bool isActivityPage = false}) {
   return AppBar(
     iconTheme: IconThemeData(
       color: Colors.white,
@@ -21,14 +24,34 @@ AppBar header(context, {bool isAppTitle = false, String strTitle, disappearedBac
     ),
     centerTitle: isAppTitle,
     backgroundColor: Theme.of(context).accentColor,
+    brightness: Brightness.dark, // status bar brightness
     actions: <Widget>[
       if (isAppTitle)
         IconButton(
           icon: Icon(
-            Icons.chat_bubble_outline,
+            FontAwesomeIcons.rocketchat,
+            size: 20.0,
             color: Colors.white,
           ),
           onPressed: () => navigateToChats(context),
+        ),
+      if (isActivityPage)
+        IconButton(
+          icon: Icon(
+            FontAwesomeIcons.userPlus,
+            size: 20.0,
+            color: Colors.white,
+          ),
+          onPressed: () => navigateToFollowRequests(context),
+        ),
+      if (isActivityPage)
+        IconButton(
+          icon: Icon(
+            FontAwesomeIcons.photoVideo,
+            size: 20.0,
+            color: Colors.white,
+          ),
+          onPressed: () => navigateToExperiment(context),
         )
     ],
   );
@@ -40,6 +63,39 @@ navigateToChats(context) {
           pageBuilder: (context, animation, _) {
             return ChatsPage();
           }, opaque: false,
+      )
+  );
+}
+
+navigateToFollowRequests(context) {
+  Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => Stack(
+          children: [
+            FollowRequestsPage(),
+            const Align(
+              alignment: Alignment.bottomRight,
+              child: AddTodoButton(),
+            ),
+          ],
+        ),
+      )
+  );
+}
+
+
+navigateToExperiment(context) {
+  Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => Stack(
+          children: [
+            StaggeredGridWidget(),
+            const Align(
+              alignment: Alignment.bottomRight,
+              child: AddTodoButton(),
+            ),
+          ],
+        ),
       )
   );
 }

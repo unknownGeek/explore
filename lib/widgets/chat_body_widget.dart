@@ -39,10 +39,10 @@ class _ChatBodyWidgetState extends State<ChatBodyWidget> {
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.black,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(25),
-          topRight: Radius.circular(25),
-        ),
+        // borderRadius: BorderRadius.only(
+        //   topLeft: Radius.circular(25),//25
+        //   topRight: Radius.circular(25),//25
+        // ),
       ),
       child: buildChats(),
     ),

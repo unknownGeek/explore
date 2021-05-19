@@ -77,7 +77,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return Scaffold(
       key: _scaffoldGlobalKey,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Theme.of(context).accentColor,
+        brightness: Brightness.dark, // status bar brightness
         iconTheme: IconThemeData(color: Colors.white),
         title: Text(
           "Edit Profile",

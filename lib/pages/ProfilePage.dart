@@ -12,6 +12,8 @@ import 'package:explore/widgets/ProgressWidget.dart';
 import 'package:explore/widgets/HeaderWidget.dart';
 import 'package:flutter/material.dart';
 
+import 'chatPage.dart';
+
 class ProfilePage extends StatefulWidget {
   final String userProfileId;
 
@@ -123,11 +125,6 @@ class _ProfilePageState extends State<ProfilePage> {
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  // CircleAvatar(
-                  //   radius: 45.0,
-                  //   backgroundColor: Colors.grey,
-                  //   backgroundImage: CachedNetworkImageProvider(user.url),
-                  // ),
                   Stack(
                     children: [
                       CircleAvatar(
@@ -348,6 +345,49 @@ class _ProfilePageState extends State<ProfilePage> {
 
   createButtonTitleAndFunction({String title, Function performFunction}) {
     bool ownProfile = currentOnlineUserId == widget.userProfileId;
+    if (title == 'Unfollow') {
+      return Row(
+        children: [
+          Container(
+            padding: EdgeInsets.only(top: 3.0),
+            child: FlatButton(
+              onPressed: performFunction,
+              child: Container(
+                width: 100.0,
+                height: 26.0,
+                child: Text(title, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: ownProfile || isRequestPending ? Colors.black : (isFollowing ? Colors.black : Colors.deepPurple),
+                  border: Border.all(color: ownProfile || isRequestPending ? Colors.grey : (isFollowing ? Colors.grey : Colors.deepPurple),),
+                  borderRadius: BorderRadius.circular(6.0),
+                ),
+              ),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.only(top: 3.0),
+            child: FlatButton(
+              onPressed: () =>
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => ChatPage(friendUser: profileUser),
+                  )),
+              child: Container(
+                width: 100.0,
+                height: 26.0,
+                child: Text('Message', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(6.0),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
     return Container(
       padding: EdgeInsets.only(top: 3.0),
       child: FlatButton(
@@ -389,7 +429,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: header(
           context,
-          strTitle: profileUser != null && profileUser.username != null ? profileUser.username : "Profile"),
+          strTitle: profileUser != null && profileUser.username != null ? profileUser.username : "Profile",),
       body: ownProfile == true || isFollowing == true ? ListView(
         children: <Widget>[
           createProfileTopView(),

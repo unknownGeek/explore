@@ -18,9 +18,17 @@ class ChatHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
+        decoration: BoxDecoration(
+          color: Colors.deepPurple,
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(25),//25
+            bottomRight: Radius.circular(25),
+            topRight: Radius.circular(25),//25
+            topLeft: Radius.circular(25),//25
+          ),
+        ),
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         width: double.infinity,
-        color: Colors.deepPurple,
         child: Stack(
           children: [
             Column(

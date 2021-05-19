@@ -1,5 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:explore/models/user.dart';
+import 'package:explore/widgets/StaggeredGridWidget.dart';
 import 'package:flutter/material.dart';
 
 import 'custom_rect_tween.dart';
@@ -79,157 +78,158 @@ class _AddTodoPopupCard extends StatelessWidget {
     double size = MediaQuery.of(context).size.width;
     return Center(
       child: Padding(
-        padding: const EdgeInsets.only(left: 150.0, bottom: 90.0, right: 20.0, top: 79.0),
+        padding: const EdgeInsets.only(left: 80.0, right: 1.0,),
         child: Hero(
           tag: _heroAddTodo,
           createRectTween: (begin, end) {
             return CustomRectTween(begin: begin, end: end);
           },
-          child: Material(
-            color: Colors.deepPurple,
-            elevation: 2,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const TextField(
-                      decoration: InputDecoration(
-                        hintText: 'New todo',
-                        hintStyle: TextStyle(color: Colors.white),
-                        border: InputBorder.none,
-                      ),
-                      cursorColor: Colors.white,
-                    ),
-                    const Divider(
-                      color: Colors.white,
-                      thickness: 0.2,
-                    ),
-                    const TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Write a note',
-                        hintStyle: TextStyle(color: Colors.white),
-                        border: InputBorder.none,
-                      ),
-                      cursorColor: Colors.white,
-                      maxLines: 6,
-                    ),
-                    const Divider(
-                      color: Colors.white,
-                      thickness: 0.2,
-                    ),
-                    const TextField(
-                      decoration: InputDecoration(
-                        hintText: 'New todo',
-                        hintStyle: TextStyle(color: Colors.white),
-                        border: InputBorder.none,
-                      ),
-                      cursorColor: Colors.white,
-                    ),
-                    const Divider(
-                      color: Colors.white,
-                      thickness: 0.2,
-                    ),
-                    const TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Write a note',
-                        hintStyle: TextStyle(color: Colors.white),
-                        border: InputBorder.none,
-                      ),
-                      cursorColor: Colors.white,
-                      maxLines: 6,
-                    ),
-                    const Divider(
-                      color: Colors.white,
-                      thickness: 0.2,
-                    ),
-                    const TextField(
-                      decoration: InputDecoration(
-                        hintText: 'New todo',
-                        hintStyle: TextStyle(color: Colors.white),
-                        border: InputBorder.none,
-                      ),
-                      cursorColor: Colors.white,
-                    ),
-                    const Divider(
-                      color: Colors.white,
-                      thickness: 0.2,
-                    ),
-                    const TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Write a note',
-                        hintStyle: TextStyle(color: Colors.white),
-                        border: InputBorder.none,
-                      ),
-                      cursorColor: Colors.white,
-                      maxLines: 6,
-                    ),
-                    const Divider(
-                      color: Colors.white,
-                      thickness: 0.2,
-                    ),
-                    const TextField(
-                      decoration: InputDecoration(
-                        hintText: 'New todo',
-                        hintStyle: TextStyle(color: Colors.white),
-                        border: InputBorder.none,
-                      ),
-                      cursorColor: Colors.white,
-                    ),
-                    const Divider(
-                      color: Colors.white,
-                      thickness: 0.2,
-                    ),
-                    const TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Write a note',
-                        hintStyle: TextStyle(color: Colors.white),
-                        border: InputBorder.none,
-                      ),
-                      cursorColor: Colors.white,
-                      maxLines: 6,
-                    ),
-                    const Divider(
-                      color: Colors.white,
-                      thickness: 0.2,
-                    ),
-                    const TextField(
-                      decoration: InputDecoration(
-                        hintText: 'New todo',
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(color: Colors.white),
-                      ),
-                      cursorColor: Colors.white,
-                    ),
-                    const Divider(
-                      color: Colors.white,
-                      thickness: 0.2,
-                    ),
-                    const TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Write a note',
-                        hintStyle: TextStyle(color: Colors.white),
-                        border: InputBorder.none,
-                      ),
-                      cursorColor: Colors.white,
-                      maxLines: 6,
-                    ),
-                    const Divider(
-                      color: Colors.white,
-                      thickness: 0.2,
-                    ),
-                    FlatButton(
-                      onPressed: () {},
-                      child: const Text('Add', style: TextStyle(color: Colors.white),),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          child: StaggeredGridWidget(),
+          // child: Material(
+          //   color: Colors.deepPurple,
+          //   elevation: 2,
+          //   shape:
+          //       RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+          //   child: SingleChildScrollView(
+          //     child: Padding(
+          //       padding: const EdgeInsets.all(16.0),
+          //       child: Column(
+          //         mainAxisSize: MainAxisSize.min,
+          //         children: [
+          //           const TextField(
+          //             decoration: InputDecoration(
+          //               hintText: 'New todo',
+          //               hintStyle: TextStyle(color: Colors.white),
+          //               border: InputBorder.none,
+          //             ),
+          //             cursorColor: Colors.white,
+          //           ),
+          //           const Divider(
+          //             color: Colors.white,
+          //             thickness: 0.2,
+          //           ),
+          //           const TextField(
+          //             decoration: InputDecoration(
+          //               hintText: 'Write a note',
+          //               hintStyle: TextStyle(color: Colors.white),
+          //               border: InputBorder.none,
+          //             ),
+          //             cursorColor: Colors.white,
+          //             maxLines: 6,
+          //           ),
+          //           const Divider(
+          //             color: Colors.white,
+          //             thickness: 0.2,
+          //           ),
+          //           const TextField(
+          //             decoration: InputDecoration(
+          //               hintText: 'New todo',
+          //               hintStyle: TextStyle(color: Colors.white),
+          //               border: InputBorder.none,
+          //             ),
+          //             cursorColor: Colors.white,
+          //           ),
+          //           const Divider(
+          //             color: Colors.white,
+          //             thickness: 0.2,
+          //           ),
+          //           const TextField(
+          //             decoration: InputDecoration(
+          //               hintText: 'Write a note',
+          //               hintStyle: TextStyle(color: Colors.white),
+          //               border: InputBorder.none,
+          //             ),
+          //             cursorColor: Colors.white,
+          //             maxLines: 6,
+          //           ),
+          //           const Divider(
+          //             color: Colors.white,
+          //             thickness: 0.2,
+          //           ),
+          //           const TextField(
+          //             decoration: InputDecoration(
+          //               hintText: 'New todo',
+          //               hintStyle: TextStyle(color: Colors.white),
+          //               border: InputBorder.none,
+          //             ),
+          //             cursorColor: Colors.white,
+          //           ),
+          //           const Divider(
+          //             color: Colors.white,
+          //             thickness: 0.2,
+          //           ),
+          //           const TextField(
+          //             decoration: InputDecoration(
+          //               hintText: 'Write a note',
+          //               hintStyle: TextStyle(color: Colors.white),
+          //               border: InputBorder.none,
+          //             ),
+          //             cursorColor: Colors.white,
+          //             maxLines: 6,
+          //           ),
+          //           const Divider(
+          //             color: Colors.white,
+          //             thickness: 0.2,
+          //           ),
+          //           const TextField(
+          //             decoration: InputDecoration(
+          //               hintText: 'New todo',
+          //               hintStyle: TextStyle(color: Colors.white),
+          //               border: InputBorder.none,
+          //             ),
+          //             cursorColor: Colors.white,
+          //           ),
+          //           const Divider(
+          //             color: Colors.white,
+          //             thickness: 0.2,
+          //           ),
+          //           const TextField(
+          //             decoration: InputDecoration(
+          //               hintText: 'Write a note',
+          //               hintStyle: TextStyle(color: Colors.white),
+          //               border: InputBorder.none,
+          //             ),
+          //             cursorColor: Colors.white,
+          //             maxLines: 6,
+          //           ),
+          //           const Divider(
+          //             color: Colors.white,
+          //             thickness: 0.2,
+          //           ),
+          //           const TextField(
+          //             decoration: InputDecoration(
+          //               hintText: 'New todo',
+          //               border: InputBorder.none,
+          //               hintStyle: TextStyle(color: Colors.white),
+          //             ),
+          //             cursorColor: Colors.white,
+          //           ),
+          //           const Divider(
+          //             color: Colors.white,
+          //             thickness: 0.2,
+          //           ),
+          //           const TextField(
+          //             decoration: InputDecoration(
+          //               hintText: 'Write a note',
+          //               hintStyle: TextStyle(color: Colors.white),
+          //               border: InputBorder.none,
+          //             ),
+          //             cursorColor: Colors.white,
+          //             maxLines: 6,
+          //           ),
+          //           const Divider(
+          //             color: Colors.white,
+          //             thickness: 0.2,
+          //           ),
+          //           FlatButton(
+          //             onPressed: () {},
+          //             child: const Text('Add', style: TextStyle(color: Colors.white),),
+          //           ),
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ),
       ),
     );

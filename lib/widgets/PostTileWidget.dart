@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:explore/pages/PostScreenPage.dart';
 import 'package:explore/widgets/PostWidget.dart';
+import 'package:explore/widgets/ProgressWidget.dart';
 import 'package:flutter/material.dart';
 
 class PostTile extends StatelessWidget {
@@ -35,9 +36,10 @@ class PostTile extends StatelessWidget {
                 image: imageProvider,
                 fit: BoxFit.cover,
               ),
+              borderRadius: BorderRadius.all(Radius.circular(25)),
             ),
           ),
-          placeholder: (context, url) => CircularProgressIndicator(),
+          placeholder: (context, url) => circularProgress(),
           errorWidget: (context, url, error) => Icon(Icons.error),
         ),
       ),

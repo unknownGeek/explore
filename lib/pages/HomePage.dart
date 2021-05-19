@@ -9,12 +9,13 @@ import 'package:explore/pages/SearchPage.dart';
 import 'package:explore/pages/UploadPage.dart';
 import 'package:explore/pages/TimeLinePage.dart';
 import 'package:explore/services/PushNotificationService.dart';
-import 'package:explore/todo_button/add_todo_button.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'FollowRequestsPage.dart';
 
@@ -158,37 +159,30 @@ class _HomePageState extends State<HomePage> {
           UploadPage(gCurrentUser: currentUser,),
           ActivityPage(),
           ProfilePage(userProfileId: currentUser.id),
-          Stack(
-            children: [
-              FollowRequestsPage(),
-              const Align(
-                alignment: Alignment.bottomRight,
-                child: AddTodoButton(),
-              ),
-            ],
-          ),
         ],
         controller: pageController,
         onPageChanged: whenPageChanges,
         physics: NeverScrollableScrollPhysics(),
       ),
-      bottomNavigationBar: CupertinoTabBar(
-        currentIndex: getPageIndex,
-        onTap: onTapChangePage,
-        backgroundColor: Theme.of(context).accentColor,
-        activeColor: Colors.deepPurple,
-        inactiveColor: Colors.white,
+      bottomNavigationBar: CurvedNavigationBar(
+        backgroundColor: Colors.transparent,
+        index: getPageIndex,
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home)),
-          BottomNavigationBarItem(icon: Icon(Icons.search)),
-          BottomNavigationBarItem(icon: Icon(Icons.monochrome_photos, size:  37.0,)),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite_border)),
-          BottomNavigationBarItem(icon: Icon(Icons.person)),
-          BottomNavigationBarItem(icon: Icon(Icons.person_add)),
+          Icon(Icons.home, size: 23.0, color: Colors.white,),
+          Icon(Icons.search, size: 23.0, color: Colors.white,),
+          Icon(FontAwesomeIcons.camera, size:  23.0, color: Colors.white,),
+          Icon(Icons.favorite_border, size: 23.0, color: Colors.white,),
+          Icon(FontAwesomeIcons.solidSmileWink, size: 23.0, color: Colors.white,),
         ],
+        onTap: onTapChangePage,
+        buttonBackgroundColor: Colors.deepPurple,
+        color: Colors.deepPurple,
+        animationCurve: Curves.easeInOut,
+        animationDuration: Duration(milliseconds: 800),
+        height: 48.0,
+        letIndexChange: (index) => true,
       ),
     );
-    // return RaisedButton.icon(onPressed: logoutUser, icon: Icon(Icons.close), label: Text("Sign Out"));
   }
 
   Scaffold buildSignInScreen() {

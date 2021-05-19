@@ -5,6 +5,7 @@ import 'package:explore/pages/HomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:swipe_to/swipe_to.dart';
 
+import 'ProgressWidget.dart';
 import 'message_widget.dart';
 
 
@@ -24,7 +25,7 @@ class MessagesWidget extends StatelessWidget {
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
-              return Center(child: CircularProgressIndicator());
+              return Center(child: circularProgress());
             default:
               if (snapshot.hasError) {
                 return buildText('Something Went Wrong Try later');

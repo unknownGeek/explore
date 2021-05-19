@@ -39,7 +39,8 @@ class _SearchPageState extends State<SearchPage> with AutomaticKeepAliveClientMi
 
   AppBar searchPageHeader() {
     return AppBar(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).accentColor,
+      brightness: Brightness.dark, // status bar brightness
       title: TextFormField(
         style: TextStyle(fontSize: 18.0, color: Colors.white),
         controller: searchTextEditingController,
@@ -50,11 +51,11 @@ class _SearchPageState extends State<SearchPage> with AutomaticKeepAliveClientMi
             borderSide: BorderSide(color: Colors.grey),
           ),
           focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: Colors.white),
+            borderSide: BorderSide(color: Colors.deepPurple),
           ),
           filled: true,
-          prefixIcon: Icon(Icons.person_pin, color: Colors.white, size: 30.0,),
-          suffixIcon: IconButton(icon: Icon(Icons.clear, color: Colors.white,), onPressed: emptyTheTextFormField,),
+          prefixIcon: Icon(Icons.person_pin, color: Colors.deepPurple, size: 25.0,),
+          suffixIcon: IconButton(icon: Icon(Icons.clear, color: Colors.deepPurple,), onPressed: emptyTheTextFormField,),
         ),
         onFieldSubmitted: controlSearching,
       ),
@@ -67,11 +68,11 @@ class _SearchPageState extends State<SearchPage> with AutomaticKeepAliveClientMi
       child: Center(
         child: ListView(
           children: <Widget>[
-            Icon(Icons.group, color: Colors.grey, size: 200.0,),
+            Icon(Icons.group, color: Colors.deepPurple, size: 150.0,),
             Text(
               "Search Users",
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 65.0),
+              style: TextStyle(color: Colors.deepPurple, fontWeight: FontWeight.w500, fontSize: 25.0),
             ),
           ],
         ),

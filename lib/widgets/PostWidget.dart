@@ -302,8 +302,8 @@ class _PostState extends State<Post> {
         alignment: Alignment.center,
         children: <Widget>[
           Container(
-            height: 450.0,
-            width: 400.0,
+            height: 400.0,
+            width: double.infinity,
             child: CachedNetworkImage(
               imageUrl: url,
               imageBuilder: (context, imageProvider) => Container(
@@ -312,9 +312,10 @@ class _PostState extends State<Post> {
                     image: imageProvider,
                     fit: BoxFit.cover,
                   ),
+                  borderRadius: BorderRadius.all(Radius.circular(25)),
                 ),
               ),
-              placeholder: (context, url) => CircularProgressIndicator(),
+              placeholder: (context, url) => circularProgress(),
               errorWidget: (context, url, error) => Icon(Icons.error),
             ),
           ),
@@ -327,7 +328,7 @@ class _PostState extends State<Post> {
 
   animateHeart() {
     return showHeart ? Icon(
-      FontAwesomeIcons.fire,
+      FontAwesomeIcons.solidHeart,
       size: 100.0,
       color: Colors.redAccent,
     ) : Text("");
@@ -378,9 +379,9 @@ class _PostState extends State<Post> {
             GestureDetector(
               onTap: handleLikePost,
               child: Icon(
-                isLiked ? FontAwesomeIcons.fire : FontAwesomeIcons.fire,
-                color: isLiked ? Colors.redAccent : Colors.white,
-                size: 28.0,
+                isLiked ? FontAwesomeIcons.heartbeat : FontAwesomeIcons.heartBroken,
+                color: isLiked ? Colors.red : Colors.white,
+                size: 20.0,
               ),
             ),
             Padding(padding: EdgeInsets.only(right: 20.0)),
@@ -393,7 +394,7 @@ class _PostState extends State<Post> {
               ),
               child: Icon(
                 FontAwesomeIcons.comments,
-                size: 28.0,
+                size: 20.0,
                 color: Colors.white,
               ),
             ),

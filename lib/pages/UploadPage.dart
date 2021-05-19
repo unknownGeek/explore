@@ -80,16 +80,16 @@ class _UploadPageState extends State<UploadPage> with AutomaticKeepAliveClientMi
 
   Container displayUploadScreen() {
     return Container(
-      color: Theme.of(context).accentColor.withOpacity(0.5),
+      color: Theme.of(context).accentColor,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Icon(Icons.add_photo_alternate, color: Colors.grey, size: 200.0,),
+          Icon(Icons.add_photo_alternate, color: Colors.blueGrey, size: 120.0,),
           Padding(
-            padding: EdgeInsets.only(top: 20.0),
+            padding: EdgeInsets.only(top: 1.0),
             child: RaisedButton(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular((9.0))),
-              child: Text("Upload Image", style: TextStyle(color: Colors.white, fontSize: 20.0),),
+              child: Text("Upload Image", style: TextStyle(color: Colors.white, fontSize: 13.0),),
               color: Colors.deepPurple,
               onPressed: () => takeImage(context),
             ),
@@ -171,7 +171,8 @@ class _UploadPageState extends State<UploadPage> with AutomaticKeepAliveClientMi
   displayUploadFormScreen() {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Theme.of(context).accentColor,
+        brightness: Brightness.dark, // status bar brightness
         leading: IconButton(icon: Icon(Icons.arrow_back, color: Colors.white,), onPressed: clearPostInfo),
         title: Text("New Post", style: TextStyle(fontSize: 24.0, color: Colors.white, fontWeight: FontWeight.bold,), textAlign: TextAlign.center,),
         actions: <Widget>[
